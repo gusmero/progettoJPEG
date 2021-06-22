@@ -1,4 +1,4 @@
-package progettoJPEG;
+
 
 import javax.swing.JFrame;
 
@@ -12,6 +12,7 @@ public class DCTGraph extends JFrame{
 
   public static void DCTGraph(long durationLowPerf, long durationJTransform) {
 
+	  // 	USARE DATA SERIES
     // Prepare the data set
     DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
     barDataset.setValue(durationJTransform, "Libreria", "JTransform");

@@ -8,7 +8,6 @@ import javax.swing.border.EmptyBorder;
 import org.jtransforms.dct.DoubleDCT_2D;
 
 import progettoJPEG.DCT2;
-import progettoJPEG.DCTGraph;
 
 import java.awt.Color;
 import javax.swing.JSplitPane;
@@ -111,15 +110,6 @@ public class Interfaccia extends JFrame {
 				matrix=confronta(n);
 			}
 		});
-		
-			
-			
-			
-			
-			
-			
-			
-		
 		
 		
 		JButton btnNewButton = new JButton("Carica immagine");

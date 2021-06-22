@@ -89,5 +89,15 @@ public class DCT2 {
 		}
     	return applyDCT2(fd);
     }
+	
+	public double [][] applyIDCT2(int[][] f){
+    	double[][] fd = new double[f.length][f[0].length];
+    	for (int i = 0; i < f.length; i++) {
+			for (int j = 0; j < f[0].length; j++) {
+				fd[i][j] = f[i][j];
+			}
+		}
+    	return applyIDCT2(fd);
+    }
 
 }
