@@ -8,7 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.jtransforms.dct.DoubleDCT_2D;
 
-import progettoJPEG.DCT2;
+import Controller.DCT2;
 
 import java.awt.Color;
 import javax.swing.JSplitPane;
@@ -169,18 +169,21 @@ public class Interfaccia extends JFrame {
 	public double[][] confronta (int n) {
 		DCT2 dct2=new DCT2();
 		
+		
 		double matrix[][] = new double[n][n];
 		double matrixJtransform [][] = new double[n][n];
 		DoubleDCT_2D dct2dtest = new DoubleDCT_2D(n, n);
 		long seed = 1;
 		Random r = new Random(seed);
 		for(int i = 0; i < matrix.length; i++) {
-		for(int j = 0; j < matrix[0].length; j++) {
-		double randomValue = r.nextInt(255);
-		matrix[i][j] = randomValue;
-		matrixJtransform[i][j] = randomValue;
+			for(int j = 0; j < matrix[0].length; j++) {
+				double randomValue = r.nextInt(255);
+				matrix[i][j] = randomValue;
+				matrixJtransform[i][j] = randomValue;
+			}
 		}
-		}
+		
+		
 		long startTimeLowperf = System.nanoTime();
 		matrix=dct2.applyDCT2(matrix);
 		long endTimeLowperf = System.nanoTime();
@@ -194,6 +197,13 @@ public class Interfaccia extends JFrame {
 		DCTGraph.DCTGraph(durationLowperf, durationJtransform);
 		return matrix;
 		}
+	
+	
+	
+
+		
+	
+	
 	
 
 	

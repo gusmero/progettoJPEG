@@ -1,4 +1,9 @@
-package progettoJPEG;
+package Controller;
+
+import java.util.Random;
+
+import org.jtransforms.dct.DoubleDCT_2D;
+
 
 public class DCT2 {
 	
@@ -99,5 +104,79 @@ public class DCT2 {
 		}
     	return applyIDCT2(fd);
     }
+	
+	
+	
+	public long[] confronta2(int n) {
+		//intialization 
+		DCT2 dct2=new DCT2();
+		DoubleDCT_2D dct2dtest = new DoubleDCT_2D(n, n);
+		//array performance in una finestra di 500
+		long[] dct2Perf = new long[100];
+		long[] dct2LibPerf = new long[10];
+		
+		double matrix[][] ;
+		double matrixJtransform [][] ;
+		
+		//iterative for evaluating performance respect the growing dimension n 
+		for (int i = 0; i < dct2Perf.length; i++) {
+			//new random matrix with dimension n+1 and 
+			matrix  = initRandMatrix(n+i);
+			matrixJtransform= matrixCopy(matrix);
+			//dct2 home made performance calculation 
+			long startTimeDCT2 = System.nanoTime();
+			matrix=dct2.applyDCT2(matrix);
+			long endTimeDCT2 = System.nanoTime();
+			long durationDCT2 = (endTimeDCT2 - startTimeDCT2)/1000;
+			dct2Perf[i]=durationDCT2;
+			
+			//dct2 JTrasform library performance calculation 
+			long startTimeJtransform = System.nanoTime();
+			dct2dtest.forward(matrixJtransform, true);
+			long endTimeJtransform = System.nanoTime();
+			long durationJtransform = (endTimeJtransform - startTimeJtransform)/1000;
+			dct2LibPerf[i]=durationJtransform;
+		}
+		//DCTGraph.DCTGraph(durationLowperf, durationJtransform);
+		return incrementaleConcate(dct2Perf,dct2LibPerf);
+	}	
+	
+	
+	public long[] incrementaleConcate(long [] Array1 , long[] Array2) {
+		long[] concate = null ;
+		int position = 0;
+	    for (long object : Array1){
+	            concate[position] = object;
+	            position++;
+	    }
+	    for (long object : Array2){
+	            concate[position] = object;
+	            position++;
+	    }
+	    return concate;
+	}
+	
+	public double[][] initRandMatrix (int n){
+		double matrix[][] = new double[n][n];
+		long seed = 1;
+		Random r = new Random(seed);
+		for(int i = 0; i < matrix.length; i++) {
+			for(int j = 0; j < matrix[0].length; j++) {
+				double randomValue = r.nextInt(255);
+				matrix[i][j] = randomValue;
+			}
+		}
+		return matrix;
+	}
+	
+	public double[][] matrixCopy(double [][] matrix){
+		double copy[][] = new double[matrix.length][matrix[0].length];
+		for(int i = 0; i < matrix.length; i++) {
+			for(int j = 0; j < matrix[0].length; j++) {
+				copy[i][j] = matrix[i][j];
+			}
+		}
+		return copy;
+	}
 
 }
