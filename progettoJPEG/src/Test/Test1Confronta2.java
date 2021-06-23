@@ -34,15 +34,18 @@ class Test1Confronta2 {
 	@Test
 	void test() {
 		DCT2 dct2=new DCT2();
-	     DoubleDCT_2D dct2D=new DoubleDCT_2D(10,10);
-		
-	     
+	    
 	     long seed = 1;
 	     Random r = new Random(seed);
 	     double n = r.nextInt(100);
 	     
-	     long [] performance=dct2.confronta2((int)n);
+	     long [][] performance=null;
+	     performance= dct2.confronta2(10 , 50 ,5);
+	     //System.out.println(performance[0][0]);
 	     
+	     for (int i = 0; i < performance[0].length; i++) {
+			System.out.println(performance[0][i] +" "+performance[1][i]   );
+		}
 	     assertNotNull(performance);
 	}
 

@@ -47,6 +47,8 @@ public class Interfaccia extends JFrame {
 	private JTextField txtInteroD;
 	public File selectedFile = null;
 	private JTextField txtN;
+	private JTextField txtNmax;
+	private JTextField txtStep;
 
 	/**
 	 * Launch the application.
@@ -101,14 +103,33 @@ public class Interfaccia extends JFrame {
 		panel_1.add(txtN);
 		txtN.setColumns(5);
 		
+		JLabel lblNmax = new JLabel("Nmax");
+		panel_1.add(lblNmax);
+		
+		txtNmax = new JTextField();
+		panel_1.add(txtNmax);
+		txtNmax.setColumns(5);
+		
+		JLabel lblStep = new JLabel("Step");
+		panel_1.add(lblStep);
+		
+		txtStep = new JTextField();
+		panel_1.add(txtStep);
+		txtStep.setColumns(5);
+		
 		JButton btnConfronta = new JButton("Confronta");
 		panel_1.add(btnConfronta);
 		btnConfronta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				DCT2 dct2=new DCT2();
+				
 				int n=Integer.parseInt(txtN.getText());
-				System.out.println(n);
-				double [][] matrix= new double[n][n];
-				matrix=confronta(n);
+				int nMax=Integer.parseInt(txtNmax.getText());
+				int step=Integer.parseInt(txtStep.getText());
+				long [][] result = new long[2][(nMax-n)/step];
+				result=dct2.confronta2( n ,nMax,step);
+				ComparisonChart comparison=new ComparisonChart();
+				comparison.DCTGraph(result, n, nMax, step);
 			}
 		});
 		

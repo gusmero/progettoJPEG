@@ -107,38 +107,48 @@ public class DCT2 {
 	
 	
 	
-	public long[] confronta2(int n) {
+	public long[][] confronta2(int n , int max , int step ) {
+		System.out.println("start ");
 		//intialization 
-		DCT2 dct2=new DCT2();
-		DoubleDCT_2D dct2dtest = new DoubleDCT_2D(n, n);
+		DoubleDCT_2D dct2dtest ;
 		//array performance in una finestra di 500
-		long[] dct2Perf = new long[100];
-		long[] dct2LibPerf = new long[10];
-		
+		long [][] result = new long[2][(max-n)/step];
+		System.out.println(result[0].length);
 		double matrix[][] ;
 		double matrixJtransform [][] ;
 		
 		//iterative for evaluating performance respect the growing dimension n 
-		for (int i = 0; i < dct2Perf.length; i++) {
+		
+		for (int i = 0; i < result[0].length; i++) {
+			System.out.println(i);
 			//new random matrix with dimension n+1 and 
-			matrix  = initRandMatrix(n+i);
+			dct2dtest = new DoubleDCT_2D(n+i*step, n+i*step);
+			matrix  = initRandMatrix(n+i*step);
 			matrixJtransform= matrixCopy(matrix);
 			//dct2 home made performance calculation 
 			long startTimeDCT2 = System.nanoTime();
-			matrix=dct2.applyDCT2(matrix);
+			matrix=applyDCT2(matrix);
 			long endTimeDCT2 = System.nanoTime();
 			long durationDCT2 = (endTimeDCT2 - startTimeDCT2)/1000;
-			dct2Perf[i]=durationDCT2;
+			//System.out.println(durationDCT2);
+			result[0][i]=durationDCT2;
 			
 			//dct2 JTrasform library performance calculation 
 			long startTimeJtransform = System.nanoTime();
 			dct2dtest.forward(matrixJtransform, true);
 			long endTimeJtransform = System.nanoTime();
 			long durationJtransform = (endTimeJtransform - startTimeJtransform)/1000;
-			dct2LibPerf[i]=durationJtransform;
+			result[1][i]=durationJtransform;
+			//System.out.println(result[1][i]);
+			
 		}
+		
+		
+		
+		
 		//DCTGraph.DCTGraph(durationLowperf, durationJtransform);
-		return incrementaleConcate(dct2Perf,dct2LibPerf);
+		//System.out.println(result[1][1]);
+		return result;
 	}	
 	
 	
