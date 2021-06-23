@@ -141,10 +141,10 @@ public class Interfaccia extends JFrame {
 		JLabel lblImage = new JLabel() ;
 		panel_3.add(lblImage);
 		
+		
+		// CARICA FILE
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				
 				selectedFile = selectFile();
 				displayFile(selectedFile , lblImage);
 			}
@@ -164,28 +164,86 @@ public class Interfaccia extends JFrame {
 		panel_1.add(btnComprimiImmagine);
 		btnComprimiImmagine.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BufferedImage bufferimage = null;
-				try {
-					bufferimage = ImageIO.read(selectedFile);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				int [][] pixels =convertTo2DWithoutUsingGetRGB(bufferimage);
-				DCT2 dct2=new DCT2();
-				dct2.applyDCT2(pixels);
+				int[][]pixels=convertiFile2Pixel();
 				DoubleDCT_2D dct2D=new DoubleDCT_2D(pixels.length,pixels[0].length);
 				double [][] newmatrix =new double [10][10];
 				dct2D.forward(newmatrix, true);
 				dct2D.inverse(newmatrix, true);
 			}
-		});
-		
-		
-		
-		
+		});	
+	}
+	
+	
+	
+	public int[][] convertiFile2Pixel(){
+		BufferedImage bufferimage = null;
+		try {
+			bufferimage = ImageIO.read(selectedFile);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		int [][] pixels =convertTo2DWithoutUsingGetRGB(bufferimage);
+		return pixels;
+	}
+	
+	public int[][] suddividi(int[][]matrix, int f , int d){
+		int [][] block=new int [f][f];
+		double [][] blockDouble=new double [f][f];
+		for (int i = 0; i < matrix.length; i=i+f) {
+			for (int j = 0; j < matrix[0].length; j=j+f) {
+				
+				//creazione blocco
+				for (int k = 0; k < f; k++) {
+					for (int l = 0; l < f; l++) {
+						block[k][l]=matrix[k+i][l+j];
+					}
+				}
+				
+				//DCTlibrary
+				DoubleDCT_2D dct2D=new DoubleDCT_2D(f,f);
+				blockDouble=conversione(block);
+				dct2D.forward(blockDouble, true);
+				//filtraggio
+				blockDouble=filtraggio(blockDouble,d);
+				//DCT inversa
+				dct2D.inverse(blockDouble, true);
+				
+				// rinserirlo nella matrix
+				for (int k = 0; k < f; k++) {
+					for (int l = 0; l < f; l++) {
+						matrix[i+k][j+l]=(int)blockDouble[k][l];
+					}
+				}
+			}
+		}
+		return matrix;
+	}
+	
+	public double[][] filtraggio (double [][] blockDouble ,int d){
+		for (int i = 0; i < blockDouble.length; i++) {
+			for (int j = 0; j < blockDouble[0].length; j++) {
+				if(i> d && j>d) {
+					blockDouble[i][j]=0;
+				}
+			}
+		}
+		return blockDouble;
 		
 	}
+	
+	
+	public double [][] conversione(int[][] newmatrix){
+		double [][] pippo=new double [10][10];
+		for (int i = 0; i < newmatrix.length; i++) {
+			for (int j = 0; j < newmatrix[0].length; j++) {
+				pippo[i][j]=(int)newmatrix[i][j];
+			}
+		}
+		return pippo;
+	}
+	
+	//filtro -> dct2 -> inversa
 	
 	public double[][] confronta (int n) {
 		DCT2 dct2=new DCT2();
