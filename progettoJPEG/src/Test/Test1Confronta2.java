@@ -40,7 +40,7 @@ class Test1Confronta2 {
 	     double n = r.nextInt(100);
 	     
 	     long [][] performance=null;
-	     performance= dct2.confronta2(10 , 50 ,5);
+	     performance= dct2.compare(10 , 50 ,5);
 	     //System.out.println(performance[0][0]);
 	     
 	     for (int i = 0; i < performance[0].length; i++) {

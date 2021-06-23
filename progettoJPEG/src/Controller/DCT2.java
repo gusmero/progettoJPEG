@@ -107,21 +107,19 @@ public class DCT2 {
 	
 	
 	
-	public long[][] confronta2(int n , int max , int step ) {
-		System.out.println("start ");
-		//intialization 
-		DoubleDCT_2D dct2dtest ;
-		//array performance in una finestra di 500
-		long [][] result = new long[2][(max-n)/step];
-		System.out.println(result[0].length);
-		double matrix[][] ;
-		double matrixJtransform [][] ;
+	public long[][] compare(int n, int max, int step) {
 		
-		//iterative for evaluating performance respect the growing dimension n 
+		DoubleDCT_2D dct2dtest;
+		
+		long[][] result = new long[2][(max-n)/step];
+		System.out.println(result[0].length);
+		double matrix[][];
+		double matrixJtransform[][];
+		
 		
 		for (int i = 0; i < result[0].length; i++) {
 			System.out.println(i);
-			//new random matrix with dimension n+1 and 
+	
 			dct2dtest = new DoubleDCT_2D(n+i*step, n+i*step);
 			matrix  = initRandMatrix(n+i*step);
 			matrixJtransform= matrixCopy(matrix);
@@ -130,7 +128,6 @@ public class DCT2 {
 			matrix=applyDCT2(matrix);
 			long endTimeDCT2 = System.nanoTime();
 			long durationDCT2 = (endTimeDCT2 - startTimeDCT2)/1000;
-			//System.out.println(durationDCT2);
 			result[0][i]=durationDCT2;
 			
 			//dct2 JTrasform library performance calculation 
@@ -139,32 +136,11 @@ public class DCT2 {
 			long endTimeJtransform = System.nanoTime();
 			long durationJtransform = (endTimeJtransform - startTimeJtransform)/1000;
 			result[1][i]=durationJtransform;
-			//System.out.println(result[1][i]);
-			
 		}
 		
-		
-		
-		
-		//DCTGraph.DCTGraph(durationLowperf, durationJtransform);
-		//System.out.println(result[1][1]);
 		return result;
 	}	
 	
-	
-	public long[] incrementaleConcate(long [] Array1 , long[] Array2) {
-		long[] concate = null ;
-		int position = 0;
-	    for (long object : Array1){
-	            concate[position] = object;
-	            position++;
-	    }
-	    for (long object : Array2){
-	            concate[position] = object;
-	            position++;
-	    }
-	    return concate;
-	}
 	
 	public double[][] initRandMatrix (int n){
 		double matrix[][] = new double[n][n];
