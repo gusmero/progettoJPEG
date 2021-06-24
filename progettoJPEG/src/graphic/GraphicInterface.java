@@ -1,16 +1,24 @@
 package graphic;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -19,11 +27,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
 import org.jtransforms.dct.DoubleDCT_2D;
+
 import Controller.DCT2;
-import java.awt.Toolkit;
+import java.awt.GridLayout;
+import javax.swing.JSplitPane;
 
 public class GraphicInterface extends JFrame {
 
@@ -31,6 +42,7 @@ public class GraphicInterface extends JFrame {
 	private JTextField txtInteroF;
 	private JTextField txtInteroD;
 	public File selectedFile = null;
+	public File outputFile = null;
 	private JTextField txtN;
 	private JTextField txtNmax;
 	private JTextField txtStep;
@@ -62,52 +74,47 @@ public class GraphicInterface extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-		
+
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.GRAY);
 		contentPane.add(panel, BorderLayout.SOUTH);
-		
-		JTextPane txtpnRisultati = new JTextPane();
-		txtpnRisultati.setText("Risultati Questa \u00E8 una prova dei risultati possibili ");
-		panel.add(txtpnRisultati);
-		
+
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(Color.LIGHT_GRAY);
 		contentPane.add(panel_1, BorderLayout.NORTH);
-		
+
 
 		Panel panel_3 = new Panel();
 		panel_3.setBackground(Color.WHITE);
 		contentPane.add(panel_3, BorderLayout.CENTER);
-		panel_3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
+
 		JLabel lblN = new JLabel("N:");
 		panel_1.add(lblN);
-		
+
 		txtN = new JTextField();
 		panel_1.add(txtN);
 		txtN.setColumns(5);
-		
-		JLabel lblNmax = new JLabel("Nmax");
+
+		JLabel lblNmax = new JLabel("Nmax:");
 		panel_1.add(lblNmax);
-		
+
 		txtNmax = new JTextField();
 		panel_1.add(txtNmax);
 		txtNmax.setColumns(5);
-		
-		JLabel lblStep = new JLabel("Step");
+
+		JLabel lblStep = new JLabel("Step:");
 		panel_1.add(lblStep);
-		
+
 		txtStep = new JTextField();
 		panel_1.add(txtStep);
 		txtStep.setColumns(5);
-		
+
 		JButton btnConfronta = new JButton("Confronta");
 		panel_1.add(btnConfronta);
 		btnConfronta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DCT2 dct2=new DCT2();
-				
+
 				int n=Integer.parseInt(txtN.getText());
 				int nMax=Integer.parseInt(txtNmax.getText());
 				int step=Integer.parseInt(txtStep.getText());
@@ -117,34 +124,55 @@ public class GraphicInterface extends JFrame {
 				comparison.DCTGraph(result, n, nMax, step);
 			}
 		});
-		
-		
+
+
 		JButton btnNewButton = new JButton("Carica immagine");
 		panel_1.add(btnNewButton);
-		
 
-		JLabel lblImage = new JLabel() ;
-		panel_3.add(lblImage);
-		
-		
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setResizeWeight(0.5);
+		panel_3.setLayout(new BorderLayout(0, 0));
+
+
+
+		panel_3.add(splitPane);
+
+
+		JLabel lblImage1 = new JLabel();
+		//splitPane.setLeftComponent(lblImage1);
+		JPanel panelLeft = new JPanel();
+		panelLeft.add(lblImage1,BorderLayout.CENTER);
+		splitPane.add(panelLeft, JSplitPane.LEFT);
+
+
+		JLabel lblImage2 = new JLabel();
+		//splitPane.setRightComponent(lblImage2);
+		JPanel panelRight = new JPanel();
+		panelRight.add(lblImage2,BorderLayout.CENTER);
+		splitPane.add(panelRight, JSplitPane.RIGHT);
+
 		// CARICA FILE
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectedFile = selectFile();
-				displayFile(selectedFile, lblImage);
+				displayFile(selectedFile, lblImage1);
 			}
 		});
-		
-		txtInteroD = new JTextField();
-		txtInteroD.setText("intero d");
-		panel_1.add(txtInteroD);
-		txtInteroD.setColumns(5);
-		
+
+		JLabel lblF = new JLabel("F:");
+		panel_1.add(lblF);
+
 		txtInteroF = new JTextField();
-		txtInteroF.setText("intero F");
 		panel_1.add(txtInteroF);
 		txtInteroF.setColumns(5);
-		
+
+		JLabel lblD = new JLabel("d:");
+		panel_1.add(lblD);
+
+		txtInteroD = new JTextField();
+		panel_1.add(txtInteroD);
+		txtInteroD.setColumns(5);
+
 		JButton btnComprimiImmagine = new JButton("Comprimi");
 		panel_1.add(btnComprimiImmagine);
 		btnComprimiImmagine.addActionListener(new ActionListener() {
@@ -152,20 +180,83 @@ public class GraphicInterface extends JFrame {
 				int f = Integer.parseInt(txtInteroF.getText());
 				int d = Integer.parseInt(txtInteroD.getText());
 				int[][] pixels = convertiFile2Pixel();
-				
-				int[][] blocks = suddividi(pixels, f, d);
-				
-				DoubleDCT_2D dct2D=new DoubleDCT_2D(pixels.length,pixels[0].length);
-				double[][] newmatrix = new double[pixels.length][pixels[0].length];
-				//dct2D.forward(newmatrix, true);
-				//dct2D.inverse(newmatrix, true);
+
+
+				int[][] result = suddividi(pixels, f, d);
+
+				convertPixelsToFile(result);
+				displayFile(outputFile, lblImage2);
 			}
 		});	
 	}
-	
-	
-	
+
+
+	public void convertPixelsToFile(int[][] result) {
+
+		BufferedImage image=new BufferedImage(result.length, result[0].length,BufferedImage.TYPE_BYTE_GRAY);
+		for (int i = 0; i < result.length; i++) {
+			for (int j = 0; j < result[0].length; j++) {
+				image.setRGB(i, j,result[i][j]);
+			}
+		}
+		outputFile = new File("compressed.bmp");
+		try {
+			ImageIO.write(image, "BMP", outputFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	//		BufferedImage image = new BufferedImage(result.length, result[0].length, BufferedImage.TYPE_BYTE_BINARY);
+	//		WritableRaster raster = (WritableRaster) image.getData();
+	//		int[] aus = new int[result[0].length];
+	//		for (int col = 0; col < result[0].length; col++) {
+	//			System.out.println(result.length);
+	//			System.out.println(result[0].length);
+	//			aus = result[col];
+	//			raster.setPixels(col,0,result.length, result[0].length, aus);
+	//		}
+	//		image = new BufferedImage(getColorModel(), raster, rootPaneCheckingEnabled, null);
+	//		outputFile = new File("compressed.bmp");
+	//		try {
+	//			ImageIO.write(image, "bmp", outputFile);
+	//		} catch (IOException e) {
+	//			// TODO Auto-generated catch block
+	//			e.printStackTrace();
+	//		}
+	//	}
+
+	//	public BufferedImage convertPixelsToImg(int[][] result){
+	//		BufferedImage bufferimage = new BufferedImage(result.length, result[0].length, BufferedImage.TYPE_BYTE_BINARY);
+	//		for (int row = 0; row < result.length; row++) {
+	//			for (int col = 0; col < result[0].length; col++) {
+	//				System.out.println((result[row][col] << 4) & 0xFF0000);
+	//				bufferimage.setRGB(row, col, (result[row][col] << 4) & 0xFF0000);
+	//			}
+	//		}
+	//		return bufferimage;
+	//
+	//
+	//	}
+	//	public static BufferedImage getImageFromArray(int[][] result) {
+	//		BufferedImage image = new BufferedImage(result.length, result[0].length, BufferedImage.TYPE_BYTE_BINARY);
+	//		WritableRaster raster = (WritableRaster) image.getData();
+	//		int[] aus = new int[result.length];
+	//		for (int row = 0; row < result.length; row++) {
+	//			aus = result[row];
+	//			for (int col = 0; col < result[0].length; col++) {
+	//				raster.setPixels(row,col,result.length, result[0].length, aus);
+	//			}
+	//		}
+	//		
+	//		return image;
+	//	}
+
+
 	public int[][] convertiFile2Pixel(){
+
 		BufferedImage bufferimage = null;
 		try {
 			bufferimage = ImageIO.read(selectedFile);
@@ -173,56 +264,73 @@ public class GraphicInterface extends JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		int [][] pixels = convertTo2DWithoutUsingGetRGB(bufferimage);
+		int width = bufferimage.getWidth();
+		int height = bufferimage.getHeight();
+		int pixels[][] = new int[width][height];
+		Raster raster = bufferimage.getData();
+		for (int i = 0; i < raster.getWidth(); i++) {
+			for (int j = 0; j < raster.getHeight(); j++) {
+				pixels[i][j] = raster.getSample(i, j, 0);
+			}
+		}
 		return pixels;
 	}
-	
+
 	public int[][] suddividi(int[][]matrix, int f , int d){
-		int [][] block=new int [f][f];
+		int[][] block=new int [f][f];
+		int[][] result = new int[matrix.length][matrix[0].length];
 		double [][] blockDouble=new double [f][f];
 		for (int i = 0; i < matrix.length; i=i+f) {
 			for (int j = 0; j < matrix[0].length; j=j+f) {
-				
-				//creazione blocco
-				for (int k = 0; k < f; k++) {
-					for (int l = 0; l < f; l++) {
-						block[k][l]=matrix[k+i][l+j];
+				if(i + f <= matrix.length && j + f <= matrix[0].length) {
+					for (int k = 0; k < f; k++) {
+						for (int l = 0; l < f; l++) {
+							block[k][l]=matrix[k+i][l+j];
+
+						}
 					}
-				}
-				
-				//DCTlibrary
-				DoubleDCT_2D dct2D=new DoubleDCT_2D(f,f);
-				blockDouble=conversione(block);
-				dct2D.forward(blockDouble, true);
-				//filtraggio
-				blockDouble=filtraggio(blockDouble,d);
-				//DCT inversa
-				dct2D.inverse(blockDouble, true);
-				
-				// reinserirlo nella matrix
-				for (int k = 0; k < f; k++) {
-					for (int l = 0; l < f; l++) {
-						matrix[i+k][j+l]=(int)blockDouble[k][l];
+					//DCTlibrary
+					DoubleDCT_2D dct2D=new DoubleDCT_2D(f,f);
+					blockDouble=conversione(block);
+
+					dct2D.forward(blockDouble, true);
+					//filtraggio
+
+					filtraggio(blockDouble,d);
+					//DCT inversa
+					dct2D.inverse(blockDouble, true);
+
+					// reinserirlo nella matrix
+					for (int k = 0; k < f; k++) {
+						for (int l = 0; l < f; l++) {
+								if(blockDouble[k][l] < 0)
+									result[i+k][j+l] = 0;
+								else
+									if(blockDouble[k][l] > 255)
+										result[i+k][j+l] = 255;
+									else
+										result[i+k][j+l]=(int)blockDouble[k][l];							
+							}
 					}
 				}
 			}
 		}
-		return matrix;
+		return result;
 	}
-	
+
 	public double[][] filtraggio (double [][] blockDouble ,int d){
 		for (int i = 0; i < blockDouble.length; i++) {
 			for (int j = 0; j < blockDouble[0].length; j++) {
 				if(i + j >= d) {
-					blockDouble[i][j]=0;
+					blockDouble[i][j] = 0;
 				}
 			}
 		}
 		return blockDouble;
-		
+
 	}
-	
-	
+
+
 	public double [][] conversione(int[][] newmatrix){
 		double [][] converted=new double[newmatrix.length][newmatrix[0].length];
 		for (int i = 0; i < newmatrix.length; i++) {
@@ -232,117 +340,97 @@ public class GraphicInterface extends JFrame {
 		}
 		return converted;
 	}
-	
-	//filtro -> dct2 -> inversa
-	
-//	public double[][] confronta (int n) {
-//		DCT2 dct2=new DCT2();
-//		
-//		
-//		double matrix[][] = new double[n][n];
-//		double matrixJtransform [][] = new double[n][n];
-//		DoubleDCT_2D dct2dtest = new DoubleDCT_2D(n, n);
-//		long seed = 1;
-//		Random r = new Random(seed);
-//		for(int i = 0; i < matrix.length; i++) {
-//			for(int j = 0; j < matrix[0].length; j++) {
-//				double randomValue = r.nextInt(255);
-//				matrix[i][j] = randomValue;
-//				matrixJtransform[i][j] = randomValue;
-//			}
-//		}
-//		
-//		
-//		long startTimeLowperf = System.nanoTime();
-//		matrix=dct2.applyDCT2(matrix);
-//		long endTimeLowperf = System.nanoTime();
-//		long durationLowperf = (endTimeLowperf - startTimeLowperf)/1000;
-//		System.out.println("Il tempo di esecuzione della dctLowPerf è: " + durationLowperf);
-//		long startTimeJtransform = System.nanoTime();
-//		dct2dtest.forward(matrixJtransform, true);
-//		long endTimeJtransform = System.nanoTime();
-//		long durationJtransform = (endTimeJtransform - startTimeJtransform)/1000;
-//		System.out.println("Il tempo di esecuzione della dctJtransform è: " + durationJtransform);
-//		DCTGraph.DCTGraph(durationLowperf, durationJtransform);
-//		return matrix;
-//		}
-	
-	
-	
 
-		
-	
-	
-	
-
-	
 	public void displayFile(File selectedFile,JLabel lblImage) {
 		Image image = null;
 		if(selectedFile!=null) {
-		try {
-			image = ImageIO.read(selectedFile);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		ImageIcon icon = new ImageIcon(image);
-		lblImage.setIcon(icon);
+			try {
+				image = ImageIO.read(selectedFile);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			double ratio;
+			if(image.getWidth(getParent()) < image.getHeight(getParent())){
+				ratio = 1.0 * image.getWidth(getParent()) / image.getHeight(getParent());
+			}else {
+				ratio = 1.0 * image.getHeight(getParent()) / image.getWidth(getParent());
+			}
+
+
+			System.out.println(ratio);
+			int width = (int)(image.getWidth(getParent()) * Math.pow(ratio, 5));
+			int height = (int)(image.getHeight(getParent()) * Math.pow(ratio, 5));
+
+			Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+			//image = image.getScaledInstance(image.getWidth(getParent())/lblImage.getParent().getWidth(), image.getHeight(getParent())/lblImage.getParent().getHeight(), Image.SCALE_SMOOTH);
+			//ImageIcon icon = new ImageIcon(image);
+			//image = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+			ImageIcon icon = new ImageIcon(scaled);
+			lblImage.setIcon(icon);
 		}
 	}
-	
-	
+
+
+	//filtro -> dct2 -> inversa
+
+	//	public double[][] confronta (int n) {
+	//		DCT2 dct2=new DCT2();
+	//		
+	//		
+	//		double matrix[][] = new double[n][n];
+	//		double matrixJtransform [][] = new double[n][n];
+	//		DoubleDCT_2D dct2dtest = new DoubleDCT_2D(n, n);
+	//		long seed = 1;
+	//		Random r = new Random(seed);
+	//		for(int i = 0; i < matrix.length; i++) {
+	//			for(int j = 0; j < matrix[0].length; j++) {
+	//				double randomValue = r.nextInt(255);
+	//				matrix[i][j] = randomValue;
+	//				matrixJtransform[i][j] = randomValue;
+	//			}
+	//		}
+	//		
+	//		
+	//		long startTimeLowperf = System.nanoTime();
+	//		matrix=dct2.applyDCT2(matrix);
+	//		long endTimeLowperf = System.nanoTime();
+	//		long durationLowperf = (endTimeLowperf - startTimeLowperf)/1000;
+	//		System.out.println("Il tempo di esecuzione della dctLowPerf è: " + durationLowperf);
+	//		long startTimeJtransform = System.nanoTime();
+	//		dct2dtest.forward(matrixJtransform, true);
+	//		long endTimeJtransform = System.nanoTime();
+	//		long durationJtransform = (endTimeJtransform - startTimeJtransform)/1000;
+	//		System.out.println("Il tempo di esecuzione della dctJtransform è: " + durationJtransform);
+	//		DCTGraph.DCTGraph(durationLowperf, durationJtransform);
+	//		return matrix;
+	//		}
+
+
+
+
+
+
+
+
+
+
+
+
+
 	public File selectFile() {
 		File selectedFile=null;
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 		int result = fileChooser.showOpenDialog(this);
 		if (result == JFileChooser.APPROVE_OPTION) {
-		    selectedFile = fileChooser.getSelectedFile();
-		    System.out.println("Selected file: " + selectedFile.getAbsolutePath());
-		    
+			selectedFile = fileChooser.getSelectedFile();
+			System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+
 		}
 		return selectedFile;
-		
+
 	}
-	
-	 private static int[][] convertTo2DWithoutUsingGetRGB(BufferedImage image) {
-	      final byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-	      final int width = image.getWidth();
-	      final int height = image.getHeight();
-	      final boolean hasAlphaChannel = image.getAlphaRaster() != null;
-	      int[][] result = new int[height][width];
-	      if (hasAlphaChannel) {
-	         final int pixelLength = 4;
-	         for (int pixel = 0, row = 0, col = 0; pixel + 3 < pixels.length; pixel += pixelLength) {
-	            int argb = 0;
-	            argb += (((int) pixels[pixel] & 0xff) << 24); // alpha
-	            argb += ((int) pixels[pixel + 1] & 0xff); // blue
-	            argb += (((int) pixels[pixel + 2] & 0xff) << 8); // green
-	            argb += (((int) pixels[pixel + 3] & 0xff) << 16); // red
-	            result[row][col] = argb;
-	            col++;
-	            if (col == width) {
-	               col = 0;
-	               row++;
-	            }
-	         }
-	      } else {
-	         final int pixelLength = 3;
-	         for (int pixel = 0, row = 0, col = 0; pixel + 2 < pixels.length; pixel += pixelLength) {
-	            int argb = 0;
-	            argb += -16777216; // 255 alpha
-	            argb += ((int) pixels[pixel] & 0xff); // blue
-	            argb += (((int) pixels[pixel + 1] & 0xff) << 8); // green
-	            argb += (((int) pixels[pixel + 2] & 0xff) << 16); // red
-	            result[row][col] = argb;
-	            col++;
-	            if (col == width) {
-	               col = 0;
-	               row++;
-	            }
-	         }
-	      }
-	      return result;
-	   }
-	
+
+
 }

@@ -59,8 +59,8 @@ class Test1DTC2 {
 				{19.7, -78.1, 0.972, -72.3 ,-21.5 ,81.3 ,63.7 ,5.90}
 				};
 				
-				originalIntMatrix =conversione(originalMatrix);
-				originalIntResult =conversione(originalResult);
+				//originalIntMatrix =conversione(originalMatrix);
+				//originalIntResult =conversione(originalResult);
 	}
 
 	@Test
@@ -72,9 +72,15 @@ class Test1DTC2 {
 		//double [][] matrix =new double [10][10];
 		double [][] matrix =new double [originalMatrix.length][originalMatrix[0].length];
 		int [][] dct2matrix =new int [matrix.length][matrix[0].length];
-
-		matrix=dct2.applyDCT2(originalMatrix);
-		dct2matrix=conversione(matrix);
+		int [][] matrix2 =new int [originalMatrix.length][originalMatrix[0].length];
+		matrix2 = suddividi(conversionei(originalMatrix),4,2);
+		System.out.println(matrix2.length);
+		System.out.println(matrix2[0].length);
+		for(int i=0;i<matrix2.length;i++)
+			for(int j=0;j<matrix2[0].length;j++)
+				System.out.println(matrix2[i][j]);
+		//matrix=dct2.applyDCT2(originalMatrix);
+		//dct2matrix=conversione(matrix);
 
 		assertEquals (  originalIntResult, dct2matrix);
 	}
@@ -84,24 +90,33 @@ class Test1DTC2 {
 	
 	
 	
-	public int [][] conversione (double [][] matrix){
-		int [][] pippo=new int [10][10];
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[0].length; j++) {
-				pippo[i][j]=(int)matrix[i][j];
-			}
-		}
-		return pippo;
-	}
-	
-	public double [][] conversione(int[][] newmatrix){
-		double [][] pippo=new double [10][10];
+//	public int [][] conversione (double [][] matrix){
+//		int [][] pippo=new int [10][10];
+//		for (int i = 0; i < matrix.length; i++) {
+//			for (int j = 0; j < matrix[0].length; j++) {
+//				pippo[i][j]=(int)matrix[i][j];
+//			}
+//		}
+//		return pippo;
+//	}
+	public int [][] conversionei(double[][] newmatrix){
+		int [][] converted=new int[newmatrix.length][newmatrix[0].length];
 		for (int i = 0; i < newmatrix.length; i++) {
 			for (int j = 0; j < newmatrix[0].length; j++) {
-				pippo[i][j]=(int)newmatrix[i][j];
+				converted[i][j]=(int)newmatrix[i][j];
 			}
 		}
-		return pippo;
+		return converted;
+	}
+	
+	public double [][] conversioned(int[][] newmatrix){
+		double [][] converted=new double[newmatrix.length][newmatrix[0].length];
+		for (int i = 0; i < newmatrix.length; i++) {
+			for (int j = 0; j < newmatrix[0].length; j++) {
+				converted[i][j]=newmatrix[i][j];
+			}
+		}
+		return converted;
 	}
 	
 	public double [][] troncaDouble(double [][] matrix){
@@ -113,10 +128,58 @@ class Test1DTC2 {
 		return matrix;
 	}
 	
+	public double[][] filtraggio (double [][] blockDouble ,int d){
+		for (int i = 0; i < blockDouble.length; i++) {
+			for (int j = 0; j < blockDouble[0].length; j++) {
+				if(i + j >= d) {
+					blockDouble[i][j]=0;
+				}
+			}
+		}
+		return blockDouble;
+
+	}
 	
 	
-	
-	
+	public int[][] suddividi(int[][]matrix, int f , int d){
+		int[][] block=new int [f][f];
+		int[][] result = new int[matrix.length][matrix[0].length];
+		double [][] blockDouble=new double [f][f];
+		for (int i = 0; i < matrix.length; i=i+f) {
+			for (int j = 0; j < matrix[0].length; j=j+f) {
+				if(i + f <= matrix.length && j + f <= matrix[0].length) {
+					for (int k = 0; k < f; k++) {
+						for (int l = 0; l < f; l++) {
+							block[k][l]=matrix[k+i][l+j];
+							
+						}
+					}
+					//DCTlibrary
+					DoubleDCT_2D dct2D=new DoubleDCT_2D(f,f);
+					blockDouble=conversioned(block);
+					dct2D.forward(blockDouble, true);
+					//filtraggio
+					blockDouble=filtraggio(blockDouble,d);
+					//DCT inversa
+					dct2D.inverse(blockDouble, true);
+
+					// reinserirlo nella matrix
+					for (int k = 0; k < f; k++) {
+						for (int l = 0; l < f; l++) {
+							if(blockDouble[k][l] < 0)
+								result[i+k][j+l] = 0;
+							else
+								if(blockDouble[k][l] > 255)
+									result[i+k][j+l] = 255;
+								else
+									result[i+k][j+l]=(int)blockDouble[k][l];							
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
 	
 	
 	
