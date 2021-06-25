@@ -7,11 +7,6 @@ import org.jtransforms.dct.DoubleDCT_2D;
 
 public class DCT2 {
 	
-	//Costruttore della classe
-		public DCT2() {
-	    
-		}
-	
 	
 	public double [][] applyDCT2(double[][] f) {
 		double[][] dctMatrix = new double[f.length][f[0].length];
@@ -112,7 +107,6 @@ public class DCT2 {
 		DoubleDCT_2D dct2dtest;
 		
 		long[][] result = new long[2][(max-n)/step];
-		System.out.println(result[0].length);
 		double matrix[][];
 		double matrixJtransform[][];
 		

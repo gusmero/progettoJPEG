@@ -1,10 +1,6 @@
 package Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Random;
-
-import org.jtransforms.dct.DoubleDCT_2D;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,19 +30,16 @@ class Test1Confronta2 {
 	@Test
 	void test() {
 		DCT2 dct2=new DCT2();
-	    
-	     long seed = 1;
-	     Random r = new Random(seed);
-	     double n = r.nextInt(100);
-	     
-	     long [][] performance=null;
-	     performance= dct2.compare(10 , 50 ,5);
-	     //System.out.println(performance[0][0]);
-	     
-	     for (int i = 0; i < performance[0].length; i++) {
+
+		long seed = 1;
+		long [][] performance=null;
+		performance= dct2.compare(10 , 50 ,5);
+		System.out.println(performance[0][0]);
+
+		for (int i = 0; i < performance[0].length; i++) {
 			System.out.println(performance[0][i] +" "+performance[1][i]   );
 		}
-	     assertNotNull(performance);
+		assertNotNull(performance);
 	}
 
 }

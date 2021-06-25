@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 
@@ -28,6 +29,10 @@ import Controller.DCT2;
 
 public class GraphicInterface extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtInteroF;
 	private JTextField txtInteroD;
@@ -184,65 +189,24 @@ public class GraphicInterface extends JFrame {
 	public void convertPixelsToFile(int[][] result) {
 
 		BufferedImage image=new BufferedImage(result.length, result[0].length,BufferedImage.TYPE_BYTE_GRAY);
+		WritableRaster wr = image.getRaster();
+		int[] pixel = new int[1];
 		for (int i = 0; i < result.length; i++) {
 			for (int j = 0; j < result[0].length; j++) {
-				image.setRGB(i, j,result[i][j]);
+				pixel[0] = result[i][j];
+				wr.setPixel(i, j, pixel);
 			}
 		}
-		outputFile = new File("compressed.bmp");
+		outputFile = new File(System.getProperty("user.dir")+"/img/compressed/COMPRESSED_"+selectedFile.getName());
 		try {
 			ImageIO.write(image, "BMP", outputFile);
+			System.out.println("File: '"+outputFile.getName()+"' Saved To: " + outputFile.getAbsolutePath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-
-	//		BufferedImage image = new BufferedImage(result.length, result[0].length, BufferedImage.TYPE_BYTE_BINARY);
-	//		WritableRaster raster = (WritableRaster) image.getData();
-	//		int[] aus = new int[result[0].length];
-	//		for (int col = 0; col < result[0].length; col++) {
-	//			System.out.println(result.length);
-	//			System.out.println(result[0].length);
-	//			aus = result[col];
-	//			raster.setPixels(col,0,result.length, result[0].length, aus);
-	//		}
-	//		image = new BufferedImage(getColorModel(), raster, rootPaneCheckingEnabled, null);
-	//		outputFile = new File("compressed.bmp");
-	//		try {
-	//			ImageIO.write(image, "bmp", outputFile);
-	//		} catch (IOException e) {
-	//			// TODO Auto-generated catch block
-	//			e.printStackTrace();
-	//		}
-	//	}
-
-	//	public BufferedImage convertPixelsToImg(int[][] result){
-	//		BufferedImage bufferimage = new BufferedImage(result.length, result[0].length, BufferedImage.TYPE_BYTE_BINARY);
-	//		for (int row = 0; row < result.length; row++) {
-	//			for (int col = 0; col < result[0].length; col++) {
-	//				System.out.println((result[row][col] << 4) & 0xFF0000);
-	//				bufferimage.setRGB(row, col, (result[row][col] << 4) & 0xFF0000);
-	//			}
-	//		}
-	//		return bufferimage;
-	//
-	//
-	//	}
-	//	public static BufferedImage getImageFromArray(int[][] result) {
-	//		BufferedImage image = new BufferedImage(result.length, result[0].length, BufferedImage.TYPE_BYTE_BINARY);
-	//		WritableRaster raster = (WritableRaster) image.getData();
-	//		int[] aus = new int[result.length];
-	//		for (int row = 0; row < result.length; row++) {
-	//			aus = result[row];
-	//			for (int col = 0; col < result[0].length; col++) {
-	//				raster.setPixels(row,col,result.length, result[0].length, aus);
-	//			}
-	//		}
-	//		
-	//		return image;
-	//	}
 
 
 	public int[][] convertiFile2Pixel(){
@@ -333,6 +297,8 @@ public class GraphicInterface extends JFrame {
 
 	public void displayFile(File selectedFile,JLabel lblImage) {
 		Image image = null;
+		int width;
+		int height;
 		if(selectedFile!=null) {
 			try {
 				image = ImageIO.read(selectedFile);
@@ -343,73 +309,22 @@ public class GraphicInterface extends JFrame {
 			double ratio;
 			if(image.getWidth(getParent()) < image.getHeight(getParent())){
 				ratio = 1.0 * image.getWidth(getParent()) / image.getHeight(getParent());
+				width = (int)(image.getWidth(getParent()) * Math.pow(ratio, image.getHeight(getParent())/1000));
+				height = (int)(image.getHeight(getParent()) * Math.pow(ratio, image.getHeight(getParent())/1000));
 			}else {
 				ratio = 1.0 * image.getHeight(getParent()) / image.getWidth(getParent());
+				width = (int)(image.getWidth(getParent()) * Math.pow(ratio, image.getWidth(getParent())/1000));
+				height = (int)(image.getHeight(getParent()) * Math.pow(ratio, image.getWidth(getParent())/1000));
 			}
 
 
-			System.out.println(ratio);
-			int width = (int)(image.getWidth(getParent()) * Math.pow(ratio, 5));
-			int height = (int)(image.getHeight(getParent()) * Math.pow(ratio, 5));
-
 			Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-			//image = image.getScaledInstance(image.getWidth(getParent())/lblImage.getParent().getWidth(), image.getHeight(getParent())/lblImage.getParent().getHeight(), Image.SCALE_SMOOTH);
-			//ImageIcon icon = new ImageIcon(image);
-			//image = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
 			ImageIcon icon = new ImageIcon(scaled);
 			lblImage.setIcon(icon);
 		}
 	}
 
-
-	//filtro -> dct2 -> inversa
-
-	//	public double[][] confronta (int n) {
-	//		DCT2 dct2=new DCT2();
-	//		
-	//		
-	//		double matrix[][] = new double[n][n];
-	//		double matrixJtransform [][] = new double[n][n];
-	//		DoubleDCT_2D dct2dtest = new DoubleDCT_2D(n, n);
-	//		long seed = 1;
-	//		Random r = new Random(seed);
-	//		for(int i = 0; i < matrix.length; i++) {
-	//			for(int j = 0; j < matrix[0].length; j++) {
-	//				double randomValue = r.nextInt(255);
-	//				matrix[i][j] = randomValue;
-	//				matrixJtransform[i][j] = randomValue;
-	//			}
-	//		}
-	//		
-	//		
-	//		long startTimeLowperf = System.nanoTime();
-	//		matrix=dct2.applyDCT2(matrix);
-	//		long endTimeLowperf = System.nanoTime();
-	//		long durationLowperf = (endTimeLowperf - startTimeLowperf)/1000;
-	//		System.out.println("Il tempo di esecuzione della dctLowPerf è: " + durationLowperf);
-	//		long startTimeJtransform = System.nanoTime();
-	//		dct2dtest.forward(matrixJtransform, true);
-	//		long endTimeJtransform = System.nanoTime();
-	//		long durationJtransform = (endTimeJtransform - startTimeJtransform)/1000;
-	//		System.out.println("Il tempo di esecuzione della dctJtransform è: " + durationJtransform);
-	//		DCTGraph.DCTGraph(durationLowperf, durationJtransform);
-	//		return matrix;
-	//		}
-
-
-
-
-
-
-
-
-
-
-
-
-
 	public File selectFile() {
-		File selectedFile=null;
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 		int result = fileChooser.showOpenDialog(this);
