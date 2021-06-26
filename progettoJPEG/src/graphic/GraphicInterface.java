@@ -23,15 +23,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.jtransforms.dct.DoubleDCT_2D;
-
-import Controller.DCT2;
+import utils.DCT2;
+import utils.MatrixOperations;
 
 public class GraphicInterface extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtInteroF;
@@ -43,7 +39,7 @@ public class GraphicInterface extends JFrame {
 	private JTextField txtStep;
 
 	/**
-	 * Launch the application.
+	 * Lancio applicazione
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -59,7 +55,7 @@ public class GraphicInterface extends JFrame {
 	}
 
 	/**
-	 * Create the frame.
+	 * Creazione Frame
 	 */
 	public GraphicInterface() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -108,14 +104,12 @@ public class GraphicInterface extends JFrame {
 		panel_1.add(btnConfronta);
 		btnConfronta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DCT2 dct2=new DCT2();
-
-				int n=Integer.parseInt(txtN.getText());
-				int nMax=Integer.parseInt(txtNmax.getText());
-				int step=Integer.parseInt(txtStep.getText());
+				int n = Integer.parseInt(txtN.getText());
+				int nMax = Integer.parseInt(txtNmax.getText());
+				int step = Integer.parseInt(txtStep.getText());
 				long [][] result = new long[2][(nMax-n)/step];
-				result=dct2.compare(n, nMax, step);
-				ComparisonChart comparison=new ComparisonChart();
+				result = DCT2.compare(n, nMax, step);
+				ComparisonChart comparison = new ComparisonChart();
 				comparison.DCTGraph(result, n, nMax, step);
 			}
 		});
@@ -123,30 +117,21 @@ public class GraphicInterface extends JFrame {
 
 		JButton btnNewButton = new JButton("Carica immagine");
 		panel_1.add(btnNewButton);
-
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setResizeWeight(0.5);
 		panel_3.setLayout(new BorderLayout(0, 0));
-
-
-
 		panel_3.add(splitPane);
-
-
 		JLabel lblImage1 = new JLabel();
-		//splitPane.setLeftComponent(lblImage1);
 		JPanel panelLeft = new JPanel();
 		panelLeft.add(lblImage1,BorderLayout.CENTER);
 		splitPane.add(panelLeft, JSplitPane.LEFT);
 
-
 		JLabel lblImage2 = new JLabel();
-		//splitPane.setRightComponent(lblImage2);
 		JPanel panelRight = new JPanel();
 		panelRight.add(lblImage2,BorderLayout.CENTER);
 		splitPane.add(panelRight, JSplitPane.RIGHT);
 
-		// CARICA FILE
+		// Carica file
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectedFile = selectFile();
@@ -174,48 +159,38 @@ public class GraphicInterface extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				int f = Integer.parseInt(txtInteroF.getText());
 				int d = Integer.parseInt(txtInteroD.getText());
-				int[][] pixels = convertiFile2Pixel();
-
-
-				int[][] result = suddividi(pixels, f, d);
-
+				int[][] pixels = convertFileToPixels();
+				int[][] result = MatrixOperations.subdivide(pixels, f, d);
 				convertPixelsToFile(result);
 				displayFile(outputFile, lblImage2);
 			}
 		});	
 	}
 
+	/**
+	 * Selezione file da cartella di progetto
+	 */
+	public File selectFile() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+		int result = fileChooser.showOpenDialog(this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			selectedFile = fileChooser.getSelectedFile();
+			System.out.println("Selected file: " + selectedFile.getAbsolutePath());
 
-	public void convertPixelsToFile(int[][] result) {
-
-		BufferedImage image=new BufferedImage(result.length, result[0].length,BufferedImage.TYPE_BYTE_GRAY);
-		WritableRaster wr = image.getRaster();
-		int[] pixel = new int[1];
-		for (int i = 0; i < result.length; i++) {
-			for (int j = 0; j < result[0].length; j++) {
-				pixel[0] = result[i][j];
-				wr.setPixel(i, j, pixel);
-			}
 		}
-		outputFile = new File(System.getProperty("user.dir")+"/img/compressed/COMPRESSED_"+selectedFile.getName());
-		try {
-			ImageIO.write(image, "BMP", outputFile);
-			System.out.println("File: '"+outputFile.getName()+"' Saved To: " + outputFile.getAbsolutePath());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return selectedFile;
 	}
-
-
-
-	public int[][] convertiFile2Pixel(){
+	
+	/**
+	 * Conversione dell'immagine in una matrice di pixels
+	 */
+	public int[][] convertFileToPixels(){
 
 		BufferedImage bufferimage = null;
 		try {
 			bufferimage = ImageIO.read(selectedFile);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		int width = bufferimage.getWidth();
@@ -230,112 +205,58 @@ public class GraphicInterface extends JFrame {
 		return pixels;
 	}
 
-	public int[][] suddividi(int[][]matrix, int f , int d){
-		int[][] block=new int [f][f];
-		int[][] result = new int[matrix.length][matrix[0].length];
-		double [][] blockDouble=new double [f][f];
-		for (int i = 0; i < matrix.length; i=i+f) {
-			for (int j = 0; j < matrix[0].length; j=j+f) {
-				if(i + f <= matrix.length && j + f <= matrix[0].length) {
-					for (int k = 0; k < f; k++) {
-						for (int l = 0; l < f; l++) {
-							block[k][l]=matrix[k+i][l+j];
-
-						}
-					}
-					//DCTlibrary
-					DoubleDCT_2D dct2D=new DoubleDCT_2D(f,f);
-					blockDouble=conversione(block);
-
-					dct2D.forward(blockDouble, true);
-					//filtraggio
-
-					filtraggio(blockDouble,d);
-					//DCT inversa
-					dct2D.inverse(blockDouble, true);
-
-					// reinserirlo nella matrix
-					for (int k = 0; k < f; k++) {
-						for (int l = 0; l < f; l++) {
-								if(blockDouble[k][l] < 0)
-									result[i+k][j+l] = 0;
-								else
-									if(blockDouble[k][l] > 255)
-										result[i+k][j+l] = 255;
-									else
-										result[i+k][j+l]=(int)blockDouble[k][l];							
-							}
-					}
-				}
+	/**
+	 * Conversione della matrice di pixels in immagine
+	 */
+	public void convertPixelsToFile(int[][] result) {
+		//BufferedImage inizializzata con parametro TYPE_BYTE_GRAY per immagini in bianco e nero		
+		BufferedImage image = new BufferedImage(result.length, result[0].length,BufferedImage.TYPE_BYTE_GRAY);
+		WritableRaster wr = image.getRaster();
+		int[] pixel = new int[1];
+		for (int i = 0; i < result.length; i++) {
+			for (int j = 0; j < result[0].length; j++) {
+				pixel[0] = result[i][j];
+				wr.setPixel(i, j, pixel);
 			}
 		}
-		return result;
-	}
-
-	public double[][] filtraggio (double [][] blockDouble ,int d){
-		for (int i = 0; i < blockDouble.length; i++) {
-			for (int j = 0; j < blockDouble[0].length; j++) {
-				if(i + j >= d) {
-					blockDouble[i][j] = 0;
-				}
-			}
+		outputFile = new File(System.getProperty("user.dir")+"/img/compressed/COMPRESSED_"+selectedFile.getName());
+		try {
+			ImageIO.write(image, "BMP", outputFile);
+			System.out.println("File: '"+outputFile.getName()+"' Saved To: " + outputFile.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return blockDouble;
-
 	}
 
-
-	public double [][] conversione(int[][] newmatrix){
-		double [][] converted=new double[newmatrix.length][newmatrix[0].length];
-		for (int i = 0; i < newmatrix.length; i++) {
-			for (int j = 0; j < newmatrix[0].length; j++) {
-				converted[i][j]=(int)newmatrix[i][j];
-			}
-		}
-		return converted;
-	}
-
-	public void displayFile(File selectedFile,JLabel lblImage) {
+	public void displayFile(File selectedFile, JLabel lblImage) {
 		Image image = null;
 		int width;
 		int height;
-		if(selectedFile!=null) {
+		double ratio;
+		if(selectedFile != null) {
 			try {
 				image = ImageIO.read(selectedFile);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			double ratio;
+
+			/**
+			 * Selezione della dimensione massima(Height o Width) e creazione di un ratio compreso tra 0 e 1,
+			 * Quest'ultimo viene utilizzato per scalare l'immagine mantenedo le proporzioni.
+			 */
 			if(image.getWidth(getParent()) < image.getHeight(getParent())){
 				ratio = 1.0 * image.getWidth(getParent()) / image.getHeight(getParent());
 				width = (int)(image.getWidth(getParent()) * Math.pow(ratio, image.getHeight(getParent())/1000));
 				height = (int)(image.getHeight(getParent()) * Math.pow(ratio, image.getHeight(getParent())/1000));
-			}else {
+			}
+			else {
 				ratio = 1.0 * image.getHeight(getParent()) / image.getWidth(getParent());
 				width = (int)(image.getWidth(getParent()) * Math.pow(ratio, image.getWidth(getParent())/1000));
 				height = (int)(image.getHeight(getParent()) * Math.pow(ratio, image.getWidth(getParent())/1000));
 			}
-
-
 			Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 			ImageIcon icon = new ImageIcon(scaled);
 			lblImage.setIcon(icon);
 		}
 	}
-
-	public File selectFile() {
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-		int result = fileChooser.showOpenDialog(this);
-		if (result == JFileChooser.APPROVE_OPTION) {
-			selectedFile = fileChooser.getSelectedFile();
-			System.out.println("Selected file: " + selectedFile.getAbsolutePath());
-
-		}
-		return selectedFile;
-
-	}
-
-
 }

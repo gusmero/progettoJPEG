@@ -24,13 +24,15 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.border.EmptyBorder;
 
-
-
 public class ComparisonChart extends JFrame{
+	
+	private static final long serialVersionUID = 1L;
 	JPanel contentPane;
 	JSplitPane splitPane;
 	JPanel panelLeft;
 	JPanel panelRight;
+	
+	
 	public ComparisonChart() {
 		setBounds(100, 100, 1200, 1000);
 		contentPane = new JPanel();
@@ -44,15 +46,11 @@ public class ComparisonChart extends JFrame{
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setResizeWeight(0.5);
 
-
-
-
-
 		getContentPane().add(splitPane, BorderLayout.CENTER);
 
 	}
 
-	private static final long serialVersionUID = 1L;
+	
 
 	public void DCTGraph(long [][]result, int n , int max , int step){
 		setVisible(true);
@@ -67,7 +65,7 @@ public class ComparisonChart extends JFrame{
 		panelLeft = new JPanel();
 		splitPane.setLeftComponent(panelLeft);
 		ChartPanel plotPanelHomemade = new ChartPanel(charthomemade);
-		panelLeft.add(plotPanelHomemade,BorderLayout.CENTER);
+		panelLeft.add(plotPanelHomemade,BorderLayout.NORTH);
 		splitPane.add(panelLeft, JSplitPane.LEFT);
 
 		panelRight = new JPanel();
@@ -105,8 +103,8 @@ public class ComparisonChart extends JFrame{
 		XYPlot plot = chart.getXYPlot();
 		plot.setRenderer(r);
 		ValueAxis domain, range;
-		range = new LogarithmicAxis("Time");
-		domain = new NumberAxis("Block dimension");
+		range = new LogarithmicAxis("Time (ms)");
+		domain = new NumberAxis("Block dimension (N x N)");
 		range.setAutoRange(true);
 		plot.setDomainAxis(domain);
 		plot.setRangeAxis(range);

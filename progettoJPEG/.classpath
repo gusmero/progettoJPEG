@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="utils/JTransforms-3.1-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="utils/jfreechart-1.0.19/jfreechart-1.0.19-demo.jar"/>
 	<classpathentry kind="lib" path="utils/org.junit.jupiter.api_5.7.1.v20210222-1948.jar"/>
+	<classpathentry kind="lib" path="C:/Users/olegs/Desktop/MetodiCalcolo/progettoJPEG/progettoJPEG/utils/jfreechart-1.0.19/jfreechart-1.0.19-demo.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
