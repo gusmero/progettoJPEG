@@ -30,7 +30,6 @@ class Test1Confronta2 {
 
 	@Test
 	void test() {
-		long seed = 1;
 		long [][] performance=null;
 		performance= DCT2.compare(10, 50, 5);
 		System.out.println(performance[0][0]);

@@ -1,13 +1,7 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import utils.DCT2;
 import utils.MatrixOperations;
 
@@ -45,24 +39,6 @@ class Test2IDCT2 {
 		originalIntMatrix = MatrixOperations.doubleMatrixToInt(originalMatrix);
 		originalIntResult = MatrixOperations.doubleMatrixToInt(originalResult);
 	}
-
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-	}
-
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-	}
-
-
 	@SuppressWarnings("deprecation")
 	@Test
 	void test() {
@@ -75,11 +51,6 @@ class Test2IDCT2 {
 		matrixA=DCT2.applyDCT2(originalMatrix);
 		matrixB=DCT2.applyIDCT2(matrixA);
 		matrixInt = MatrixOperations.doubleMatrixToInt(matrixB);
-		for (int i = 0; i < matrixInt.length; i++) {
-			for (int j = 0; j < matrixInt[0].length; j++) {
-				//System.out.println(matrixInt[i][j]);
-			}
-		}
 
 		assertEquals (originalIntMatrix, matrixInt);
 

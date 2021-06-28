@@ -58,24 +58,6 @@ public class DCT2 {
         return originalMatrix;
 	}
 	
-	public boolean MatrixEqualOrNot(double [][] a , double [][] b) {
-		for (int i = 0; i < b.length; i++) {
-			for (int j = 0; j < b.length; j++) {
-				if(a[i][j]!=b[i][j]) { return false; }
-			}
-		}
-		return true;
-	}
-	
-	public boolean MatrixEqualOrNot(int [][] a , int [][] b) {
-		for (int i = 0; i < b.length; i++) {
-			for (int j = 0; j < b.length; j++) {
-				if(a[i][j]!=b[i][j]) { return false; }
-			}
-		}
-		return true;
-	}
-	
 	public static double [][] applyDCT2(int[][] f){
     	double[][] fd = new double[f.length][f[0].length];
     	for (int i = 0; i < f.length; i++) {

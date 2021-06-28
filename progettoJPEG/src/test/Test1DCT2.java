@@ -1,5 +1,3 @@
-
-
 package test;
 
 import static org.junit.Assert.assertEquals;
@@ -50,25 +48,8 @@ class Test1DCT2 {
 	void test() {
 		double [][] matrix = new double [originalMatrix.length][originalMatrix[0].length];
 		int [][] dct2matrix = new int [matrix.length][matrix[0].length];
-		int [][] matrix2 = new int [originalMatrix.length][originalMatrix[0].length];
-//		matrix2 = MatrixOperations.subdivide(MatrixOperations.doubleMatrixToInt(originalMatrix),4,2);
-		
 		matrix = DCT2.applyDCT2(originalMatrix);
 		dct2matrix = MatrixOperations.doubleMatrixToInt(matrix);
-		
-		System.out.println(dct2matrix.length);
-		System.out.println(dct2matrix[0].length);
-		for(int i = 0; i<dct2matrix.length; i++)
-			for(int j = 0; j<dct2matrix[0].length; j++)
-				System.out.println(dct2matrix[i][j]);
-		
-		System.out.println("gay");
-		
-		
-		for(int i = 0; i<originalIntResult.length; i++)
-			for(int j = 0; j<originalIntResult[0].length; j++)
-				System.out.println(originalIntResult[i][j]);
-
 		assertEquals(originalIntResult, dct2matrix);
 	}
 }
